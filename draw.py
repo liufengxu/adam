@@ -97,7 +97,7 @@ for nshape, seg in enumerate(m.counties):
     color = rgb2hex(colors[countynames[nshape]])  # 颜色格式由RGB转为16位HEX
     poly = Polygon(seg, facecolor=color, edgecolor=color)  # 绘制带有颜色的地级市多边形
     ax.add_patch(poly) # 将绘制多边形添加到画布上
-plt.title('38638', fontproperties=MYFONT, fontsize=16, y=0.9)
+plt.title('O-Z38638', fontproperties=MYFONT, fontsize=16, y=0.9)
 
 # 生产渐变色legend colorbar
 # cax1 = fig.add_axes([0.18, 0.15, 0.36, 0.01])
@@ -116,5 +116,5 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 
 # 保存图片，去掉边缘白色区域，透明
-plt.savefig('38638.png', format='png', bbox_inches='tight', transparent=True, dpi=600)
+plt.savefig('O-Z38638.png', format='png', bbox_inches='tight', transparent=True, dpi=600)
 
