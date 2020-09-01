@@ -15,8 +15,8 @@ MYFONT = fm.FontProperties(fname='/Users/liufengxu/Public/MSYH.TTC')  # 准备�
 fig, ax = plt.subplots(figsize=(9, 8)) # 准备画布。注意该语句必须放到m=Basemap()之前。
 
 m = Basemap(llcrnrlon=77, llcrnrlat=14, urcrnrlon=140, urcrnrlat=51, projection='lcc', lat_1=33, lat_2=45, lon_0=100) #中国地图为投影主体
-m.readshapefile('CHN_adm_shp/CHN_adm1', 'states', drawbounds=True) # 绘制省级行政区轮廓
-m.readshapefile('CHN_adm_shp/CHN_adm2', 'counties', drawbounds=False) # 绘制地级市，但不包含轮廓
+m.readshapefile('CHN_adm_shp/CHN_adm1', 'states', drawbounds=True)  # 绘制省级行政区轮廓
+m.readshapefile('CHN_adm_shp/CHN_adm2', 'counties', drawbounds=False)  # 绘制地级市，但不包含轮廓
 # m.readshapefile('TWN_adm_shp/TWN_adm0', 'taiwan', drawbounds=True)  # 政治正确，增加台湾
 
 countynames = []
@@ -71,7 +71,18 @@ countynames_nodup = list(set(countynames))  # 去除重复
 path = 'test_map.xlsx'
 df = pd.read_excel(path, encoding='UTF-8')  # 读取数据文件到pandas
 df = df.dropna()
+df['city'] = df['city'].replace('麻城', '黄冈')
+import re
+city_list = df['city'].to_list()
+for i in city_list:
+    if i not in countynames_nodup:
+        print(i, end=':')
+        for j in countynames_nodup:
+            if re.compile(i).match(j):
+                print(j)
+                df['city'] = df['city'].replace(i, j)
 # print(df.head(10))
+# print(df[df['city']=='黔东南苗族侗族自治州'])
 pivoted = pd.pivot_table(df, index='city', values='num', aggfunc=sum)
 data = pivoted['num']
 data = data.reindex(countynames_nodup)
@@ -81,7 +92,7 @@ vmax1 = 0
 vmin1 = min(data)
 norm1 = mpl.colors.Normalize(vmin=vmin1, vmax=vmax1)  # 正态分布
 cmap2 = LinearSegmentedColormap.from_list('mycmap', ['white', 'red'])  # 定义正值colormap,白红渐变
-vmax2 = 20  # 高于20都为最深红色，如不设置阈值这里应为max(data)
+vmax2 = 10  # 高于10都为最深红色，如不设置阈值这里应为max(data)
 vmin2 = 0
 norm2 = mpl.colors.Normalize(vmin=vmin2, vmax=vmax2)
 
@@ -96,8 +107,8 @@ for index, value in data.iteritems():
 for nshape, seg in enumerate(m.counties):
     color = rgb2hex(colors[countynames[nshape]])  # 颜色格式由RGB转为16位HEX
     poly = Polygon(seg, facecolor=color, edgecolor=color)  # 绘制带有颜色的地级市多边形
-    ax.add_patch(poly) # 将绘制多边形添加到画布上
-plt.title('O-Z38638', fontproperties=MYFONT, fontsize=16, y=0.9)
+    ax.add_patch(poly)  # 将绘制多边形添加到画布上
+plt.title('O-Z38638分布', fontproperties=MYFONT, fontsize=16, y=0.9)
 
 # 生产渐变色legend colorbar
 # cax1 = fig.add_axes([0.18, 0.15, 0.36, 0.01])
